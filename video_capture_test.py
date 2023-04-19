@@ -18,10 +18,10 @@ if __name__ == "__main__":
             #     image_format=mp.ImageFormat.SRGB, data=frame)
             # frame_timestamp_ms = int(time() * 1000)
             # recognizer.recognize_async(mp_image, frame_timestamp_ms)
-            cv2.imshow("Output", frame)
+            # cv2.imshow("Output", frame)
 
-            if cv2.waitKey(1) == ord('q'):
-                break
+            # if cv2.waitKey(1) == ord('q'):
+            #     break
             i += 1
     finally:
         # release the webcam and destroy all active windows
