@@ -9,11 +9,14 @@ if __name__ == "__main__":
         i = 0
         gathered_img = np.zeros((16, 3, 240, 320))
         pred_label = 0
-        while i < 100:
+        while i < 16:
             # Read each frame from the webcam
             _, frame = cap.read()
             x, y, c = frame.shape
-            print("Frame: ", frame.shape)
+            print(f"Writing test_image_{i}.png")
+            # Save image
+            cv2.imwrite(f"test_image_{i}.png", frame)
+
             # mp_image = mp.Image(
             #     image_format=mp.ImageFormat.SRGB, data=frame)
             # frame_timestamp_ms = int(time() * 1000)
