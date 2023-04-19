@@ -3,6 +3,7 @@ if __name__ == "__main__":
     import numpy as np
     import torch
     from infer import *
+    from config import read_config
     import pathlib
     import os
 
@@ -13,9 +14,12 @@ if __name__ == "__main__":
     # model = create_mobilenetv2(pretrained_weights_path=weights_path)
     model = create_shufflenet(weights_path)
 
-    # Initialize the webcam for Hand Gesture Recognition Python project
-    cap = cv2.VideoCapture(0)
+    # Read config
+    lamp_cfg = read_config(os.path.join(cwd, "config.yaml"))
+    print("Lamp Config: ", lamp_cfg)
 
+    # Initialize the webcam for hand gesture recognition
+    cap = cv2.VideoCapture(0)
     input_dim = 112
     try:
         i = 0
@@ -30,7 +34,13 @@ if __name__ == "__main__":
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
                 pred = model(input_tensor)
                 pred_label = int(torch.argmax(pred))
-                print("Predicted Label: ", JESTER_LABELS[pred_label])
+                pred_parsed = JESTER_LABELS[pred_label]
+                print("Predicted Label: ", pred_parsed)
+                if pred_parsed == lamp_cfg.on_gesture:
+                    print("Turn lamp on!")
+                elif pred_parsed == lamp_cfg.off_gesture:
+                    print("Turn lamp off!")
+
                 gathered_img = np.zeros((16, 3, input_dim, input_dim))
             i += 1
     finally:
