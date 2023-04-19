@@ -48,6 +48,11 @@ class ModelConfig:
     finetune: bool
 
 
+@dataclass(init=True)
+class ShuffleNetConfig(ModelConfig):
+    groups: int
+
+
 def create_mobilenetv2(pretrained_weights_path: str = "/home/joseph/Desktop/jester_mobilenetv2_0.7x_RGB_16_best.pth"):
     cfg = ModelConfig(
         n_classes=27,
@@ -58,6 +63,24 @@ def create_mobilenetv2(pretrained_weights_path: str = "/home/joseph/Desktop/jest
         no_cuda=True,
         pretrain_path=pretrained_weights_path,
         finetune=False
+    )
+
+    model, _ = generate_model(cfg)
+    model.eval()
+    return model
+
+
+def create_shufflenet(pretrained_weights_path: str):
+    cfg = ShuffleNetConfig(
+        n_classes=27,
+        width_mult=0.5,
+        sample_size=112,
+        model="shufflenet",
+        arch="shufflenet",
+        no_cuda=True,
+        pretrain_path=pretrained_weights_path,
+        finetune=False,
+        groups=3,
     )
 
     model, _ = generate_model(cfg)
