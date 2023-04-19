@@ -44,7 +44,7 @@ class ModelConfig:
     model: str
     arch: str
     no_cuda: bool
-    pretrain_path: str | None
+    pretrain_path: str
     finetune: bool
 
 
