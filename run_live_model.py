@@ -1,7 +1,4 @@
 if __name__ == "__main__":
-
-    import torch
-    import numpy as np
     import cv2
     import mediapipe as mp
 
