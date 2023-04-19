@@ -39,12 +39,18 @@ if __name__ == "__main__":
                 pred_label = int(torch.argmax(pred))
                 pred_parsed = JESTER_LABELS[pred_label]
                 print("Predicted Label: ", pred_parsed)
-                if pred_parsed == lamp_cfg.on_gesture:
+                if pred_parsed != "No gesture":
                     print("Turn lamp on!")
                     driver.set_lamp_state(1, 1, 1, 1)
-                elif pred_parsed == lamp_cfg.off_gesture:
+                elif pred_parsed == "No gesture":
                     print("Turn lamp off!")
                     driver.set_lamp_state(1, 1, 1, 0)
+                # if pred_parsed == lamp_cfg.on_gesture:
+                #     print("Turn lamp on!")
+                #     driver.set_lamp_state(1, 1, 1, 1)
+                # elif pred_parsed == lamp_cfg.off_gesture:
+                #     print("Turn lamp off!")
+                #     driver.set_lamp_state(1, 1, 1, 0)
 
                 gathered_img = np.zeros((16, 3, input_dim, input_dim))
             i += 1
