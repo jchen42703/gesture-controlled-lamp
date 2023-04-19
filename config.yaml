@@ -1,0 +1,4 @@
+on_gesture: "thumbs_up"
+off_gesture: "thumbs_down"
+increase_brightness_gesture: null
+decrease_brightness_gesture: null
