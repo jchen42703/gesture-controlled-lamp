@@ -6,6 +6,7 @@ if __name__ == "__main__":
     from config import read_config
     import pathlib
     import os
+    from lamp import lamp_driver
 
     cwd = pathlib.Path(__file__).parent.resolve()
     # relative_weights_path = "weights/jester_mobilenetv2_0.7x_RGB_16_best.pth"
@@ -18,6 +19,8 @@ if __name__ == "__main__":
     lamp_cfg = read_config(os.path.join(cwd, "config.yaml"))
     print("Lamp Config: ", lamp_cfg)
 
+    # Driver
+    driver = lamp_driver.LampDriver()
     # Initialize the webcam for hand gesture recognition
     cap = cv2.VideoCapture(0)
     input_dim = 112
@@ -38,8 +41,10 @@ if __name__ == "__main__":
                 print("Predicted Label: ", pred_parsed)
                 if pred_parsed == lamp_cfg.on_gesture:
                     print("Turn lamp on!")
+                    driver.set_lamp_state(1, 1, 1, 1)
                 elif pred_parsed == lamp_cfg.off_gesture:
                     print("Turn lamp off!")
+                    driver.set_lamp_state(1, 1, 1, 0)
 
                 gathered_img = np.zeros((16, 3, input_dim, input_dim))
             i += 1
