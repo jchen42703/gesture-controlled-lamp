@@ -18,6 +18,7 @@ if __name__ == "__main__":
     try:
         i = 0
         gathered_img = np.zeros((16, 3, input_dim, input_dim))
+        pred_label = 0
         while True:
             # Read each frame from the webcam
             _, frame = cap.read()
@@ -28,8 +29,14 @@ if __name__ == "__main__":
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
                 pred = model(input_tensor)
                 pred_label = int(torch.argmax(pred))
-                print("Predicted Label: ", JESTER_LABELS[pred_label])
                 gathered_img = np.zeros((16, 3, input_dim, input_dim))
+                # show the prediction on the frame
+            cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.imshow("Output", frame)
+
+            if cv2.waitKey(1) == ord('q'):
+                break
             i += 1
     finally:
         # release the webcam and destroy all active windows
