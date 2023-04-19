@@ -3,8 +3,13 @@ if __name__ == "__main__":
     import numpy as np
     import torch
     from infer import *
+    import pathlib
+    import os
 
-    model = create_mobilenetv2()
+    cwd = pathlib.Path(__file__).parent.resolve()
+    relative_weights_path = "weights/jester_mobilenetv2_0.7x_RGB_16_best.pth"
+    weights_path = os.path.join(cwd, relative_weights_path)
+    model = create_mobilenetv2(pretrained_weights_path=weights_path)
 
     # Initialize the webcam for Hand Gesture Recognition Python project
     cap = cv2.VideoCapture(0)
