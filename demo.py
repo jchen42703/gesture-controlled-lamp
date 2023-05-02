@@ -1,18 +1,20 @@
 import time
 
 
-def detect_motion(fgmask, motion_detected, motion_start_time, motion_stop_time, human_w_h_ration=1.25, min_contour_area=500, counter=0):
-    event_id = 1
+def detect_motion(fgmask, prev_fgmask, motion_detected, motion_start_time, motion_stop_time, min_contour_area=500, counter=0):
     # Apply morphological opening to remove noise
     fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN,
                               np.ones((3, 3), np.uint8))
-    fgmask = cv2.GaussianBlur(fgmask, (21, 21), 0)
+    # fgmask = cv2.GaussianBlur(fgmask, (21, 21), 0)
 
-    # Find the contours in the binary image
-    contours, _ = cv2.findContours(
-        fgmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Check if motion is detected -> diff between frames is > frameDiffThreshold
+    frameDelta = cv2.absdiff(fgmask, prev_fgmask)
+    frameDelta = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
 
     # Find the largest contour
+    # Find the contours in the binary image
+    contours, _ = cv2.findContours(
+        frameDelta, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     largest_contour = None
     largest_contour_area = 0
     for contour in contours:
@@ -21,8 +23,10 @@ def detect_motion(fgmask, motion_detected, motion_start_time, motion_stop_time, 
             largest_contour = contour
             largest_contour_area = contour_area
 
+    print("largest contour area: ", largest_contour_area)
     # If motion is detected
-    if largest_contour is not None:
+    FRAME_DELTA_THRESH = 10000
+    if largest_contour is not None and largest_contour_area > FRAME_DELTA_THRESH:
         # event_id = 1
         # Draw a bounding box around the largest contour
         (_, _, w, h) = cv2.boundingRect(largest_contour)
@@ -39,12 +43,13 @@ def detect_motion(fgmask, motion_detected, motion_start_time, motion_stop_time, 
     else:
         # If motion was detected previously and it has been more than 3 seconds, reset the motion detected flag
         timeDiff = time.time() - motion_start_time
-        print("time difference: ", timeDiff)
+        # print("time difference: ", timeDiff)
         resetToDefault = motion_detected and (timeDiff) > 1
         if resetToDefault:
-            print("Resetting to default...")
+            # print("Resetting to default...")
             motion_detected = False
             motion_start_time = time.time()
+        print("No motion detected")
 
     return motion_detected, motion_start_time, motion_stop_time
 
@@ -69,13 +74,14 @@ if __name__ == "__main__":
 
     # Initialize variables for motion detection
     motion_detected = False
-    motion_start_time = None
+    motion_start_time = 0
     motion_stop_time = 0
     input_dim = 112
     try:
         i = 0
         gathered_img = np.zeros((16, 3, input_dim, input_dim))
         pred_label = 0
+        prev_fg_mask = None
         while True:
             # Read each frame from the webcam
             _, frame = cap.read()
@@ -86,23 +92,23 @@ if __name__ == "__main__":
             reshaped, frame = preprocess_mobilenetv2_from_cv2(
                 frame, reshape_size=(input_dim, input_dim))
             gathered_img[i % 16] = reshaped
-            if i % 16 == 0:
-                # Apply the background subtraction
-                motion_detected, motion_start_time, motion_stop_time = detect_motion(fgmask, motion_detected,
+            if i != 0 and i % 16 == 0:
+                motion_detected, motion_start_time, motion_stop_time = detect_motion(fgmask, prev_fg_mask, motion_detected,
                                                                                      motion_start_time=motion_start_time,
                                                                                      motion_stop_time=motion_stop_time,
                                                                                      counter=i)
-            if i != 0 and i % 16 == 0 and motion_detected:
-                print("Motion Detected: ", motion_detected)
-                input_tensor = preprocess_mobilenetv2_queued(gathered_img)
-                pred = model(input_tensor)
-                pred_label = int(torch.argmax(pred))
-                gathered_img = np.zeros((16, 3, input_dim, input_dim))
+                if motion_detected:
+                    print("Motion Detected: ", motion_detected)
+                    input_tensor = preprocess_mobilenetv2_queued(gathered_img)
+                    pred = model(input_tensor)
+                    pred_label = int(torch.argmax(pred))
+                    gathered_img = np.zeros((16, 3, input_dim, input_dim))
             # show the prediction on the frame
             cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.imshow("Output", frame)
             # cv2.imshow("Output", fgmask)
+            prev_fg_mask = fgmask
 
             if cv2.waitKey(1) == ord('q'):
                 break
