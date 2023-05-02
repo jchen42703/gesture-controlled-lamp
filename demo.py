@@ -114,6 +114,7 @@ if __name__ == "__main__":
             if cv2.waitKey(1) == ord('q'):
                 break
             i += 1
+            time.sleep(0.1)
     finally:
         # release the webcam and destroy all active windows
         print("Cleaning up...")
