@@ -26,9 +26,6 @@ def detect_motion(fgmask, motion_detected, motion_start_time, motion_stop_time, 
         # event_id = 1
         # Draw a bounding box around the largest contour
         (_, _, w, h) = cv2.boundingRect(largest_contour)
-        if h >= human_w_h_ration * w:
-            event_id = 2
-
         # If motion was not detected previously, set the motion start time
         if not motion_detected:
             motion_detected = True
@@ -37,22 +34,19 @@ def detect_motion(fgmask, motion_detected, motion_start_time, motion_stop_time, 
         # Update motion stop time to current time
         motion_stop_time = time.time()
 
-        return motion_detected, motion_start_time, motion_stop_time, event_id
+        return motion_detected, motion_start_time, motion_stop_time
     # If no motion is detected
     else:
-        event_id = 1
         # If motion was detected previously and it has been more than 3 seconds, reset the motion detected flag
-        resetToDefault = motion_detected and (
-            time.time() - motion_start_time) > 1
+        timeDiff = time.time() - motion_start_time
+        print("time difference: ", timeDiff)
+        resetToDefault = motion_detected and (timeDiff) > 1
         if resetToDefault:
             print("Resetting to default...")
             motion_detected = False
             motion_start_time = time.time()
 
-    return motion_detected, motion_start_time, motion_stop_time, event_id
-    # # If motion has not been detected for 5 seconds / if motion stop time has not been updated, exit the loop
-    # if time.time() - motion_stop_time > 5:
-    #     return motion_detected, motion_start_time, motion_stop_time, event_id
+    return motion_detected, motion_start_time, motion_stop_time
 
 
 if __name__ == "__main__":
@@ -94,12 +88,12 @@ if __name__ == "__main__":
             gathered_img[i % 16] = reshaped
             if i % 16 == 0:
                 # Apply the background subtraction
-                motion_detected, motion_start_time, motion_stop_time, event_id = detect_motion(fgmask, motion_detected,
-                                                                                               motion_start_time=motion_start_time,
-                                                                                               motion_stop_time=motion_stop_time,
-                                                                                               counter=i)
-                print("event id: ", event_id)
+                motion_detected, motion_start_time, motion_stop_time = detect_motion(fgmask, motion_detected,
+                                                                                     motion_start_time=motion_start_time,
+                                                                                     motion_stop_time=motion_stop_time,
+                                                                                     counter=i)
             if i != 0 and i % 16 == 0 and motion_detected:
+                print("Motion Detected: ", motion_detected)
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
                 pred = model(input_tensor)
                 pred_label = int(torch.argmax(pred))
@@ -107,8 +101,8 @@ if __name__ == "__main__":
             # show the prediction on the frame
             cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 0, 255), 2, cv2.LINE_AA)
-            # cv2.imshow("Output", frame)
-            cv2.imshow("Output", fgmask)
+            cv2.imshow("Output", frame)
+            # cv2.imshow("Output", fgmask)
 
             if cv2.waitKey(1) == ord('q'):
                 break
