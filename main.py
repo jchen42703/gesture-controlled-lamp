@@ -6,6 +6,7 @@ if __name__ == "__main__":
     from config import read_config
     import pathlib
     import os
+    import time
     from lamp import lamp_driver
 
     cwd = pathlib.Path(__file__).parent.resolve()
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     # Driver
     driver = lamp_driver.LampDriver()
     # Initialize the webcam for hand gesture recognition
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     input_dim = 112
     try:
         i = 0
@@ -33,7 +34,7 @@ if __name__ == "__main__":
             reshaped, frame = preprocess_mobilenetv2_from_cv2(
                 frame, reshape_size=(input_dim, input_dim))
             gathered_img[i % 16] = reshaped
-            if i != 0 and i % 16 == 0:
+            if i != 0 and i % 20 == 0:
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
                 pred = model(input_tensor)
                 pred_label = int(torch.argmax(pred))
@@ -54,6 +55,7 @@ if __name__ == "__main__":
 
                 gathered_img = np.zeros((16, 3, input_dim, input_dim))
             i += 1
+            time.sleep(0.1)
     finally:
         # release the webcam and destroy all active windows
         print("Cleaning up...")
