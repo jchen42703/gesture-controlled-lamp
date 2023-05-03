@@ -25,11 +25,21 @@ class GestureDetector:
             self.prev_contour_area = curr_contour_area
             return
 
+        # Problem:
+        # When moving hand away and out of view -> Stopped detecting
+        # But the moment the hand comes back in, it registers as increase
+        # brightness, which is wrong.
+        # Hence, just ignore once.
+        should_ignore = self.prev_contour_area < 30
         percent_diff = (curr_contour_area -
                         self.prev_contour_area) / self.prev_contour_area
         print("percent diff", percent_diff)
         self.prev_contour_area = curr_contour_area
         self.prev_mask = curr_mask
+
+        if should_ignore:
+            # Do nothing
+            return SUPPORTED_GESTURES[-1]
 
         # If the area size change isn't big enough, do nothing
         if abs(percent_diff) < self.abs_diff_thresh:
