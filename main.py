@@ -36,10 +36,13 @@ if __name__ == "__main__":
             gathered_img[i % 16] = reshaped
             if i != 0 and i % 20 == 0:
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
+                first_time = time.time()
                 pred = model(input_tensor)
+                after_pred_time = time.time()
                 pred_label = int(torch.argmax(pred))
                 pred_parsed = JESTER_LABELS[pred_label]
-                print("Predicted Label: ", pred_parsed)
+                print("Predicted Label: ", pred_parsed,
+                      after_pred_time - first_time, " seconds")
                 if pred_parsed != "No gesture":
                     print("Turn lamp on!")
                     driver.set_lamp_state(1, 1, 1, 1)
