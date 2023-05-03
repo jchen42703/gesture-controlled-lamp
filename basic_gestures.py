@@ -18,12 +18,12 @@ def get_frame_rate(video: cv2.VideoCapture):
             "Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
 
-def get_mask_basic(initial_frame, curr_frame):
+def get_mask_basic(initial_frame, curr_frame, threshold):
     # Check if motion is detected -> diff between frames is > frameDiffThreshold
     frameDelta = cv2.absdiff(initial_frame, curr_frame)
-    thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(frameDelta, threshold, 255, cv2.THRESH_BINARY)[1]
     thresh = cv2.dilate(thresh, None, iterations=2)
-    return thresh
+    return thresh, frameDelta
 
 
 # def get_mask(initial_frame, curr_frame):
@@ -32,13 +32,11 @@ def get_mask_basic(initial_frame, curr_frame):
 #     return fg_mask
 
 
-def get_largest_contour_area(initial_frame, curr_frame) -> bool:
+def get_largest_contour_area(initial_frame, curr_frame, threshold) -> bool:
     """Gets the largest contour area of the thresholded object
     """
     # Check if motion is detected -> diff between frames is > frameDiffThreshold
-    frameDelta = cv2.absdiff(initial_frame, curr_frame)
-    thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
-    thresh = cv2.dilate(thresh, None, iterations=2)
+    thresh, _ = get_mask_basic(initial_frame, curr_frame, threshold)
 
     # Find the largest contour
     # Find the contours in the binary image
@@ -54,7 +52,7 @@ def get_largest_contour_area(initial_frame, curr_frame) -> bool:
     return largest_contour_area
 
 
-def detect_motion(initial_frame, curr_frame) -> bool:
+def detect_motion(initial_frame, curr_frame, threshold=180) -> bool:
     """
     The gesture detection algorithm is as follows:
     1. Register initial frame.
@@ -66,7 +64,7 @@ def detect_motion(initial_frame, curr_frame) -> bool:
     5. After 16 frames, re-check the object's size in the frame. If it exceeds `AREA_THRESHOLD`, start recording again and repeat.
     """
     largest_contour_area = get_largest_contour_area(
-        initial_frame, curr_frame)
+        initial_frame, curr_frame, threshold)
     print("Largest contour area: ", largest_contour_area)
     START_RECORDING_AREA_THRESH = 700
     return largest_contour_area > START_RECORDING_AREA_THRESH
@@ -94,6 +92,7 @@ if __name__ == "__main__":
     ]
     pred_label = 0
     initial_frame_gray = None
+    initial_max = 80
     try:
         i = 0
         while True:
@@ -106,11 +105,16 @@ if __name__ == "__main__":
                 initial_frame_gray = gray
                 continue
 
-            detected = detect_motion(initial_frame_gray, gray)
+            detected = detect_motion(initial_frame_gray, gray, initial_max)
             # Record for the next 16 frames and see the changes in motion
-            mask = get_mask_basic(initial_frame_gray, gray)
+            mask, delta = get_mask_basic(initial_frame_gray, gray, initial_max)
+            if initial_max == 80:
+                initial_max = max(delta.max() * 1.75, initial_max)
+
             if detected:
                 print("Detected motion!")
+            else:
+                print("Stopped detecting...")
 
             if i != 0 and i % num_frame_collect == 0:
                 cv2.putText(frame, OPERATIONS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
@@ -121,6 +125,7 @@ if __name__ == "__main__":
                         1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.imshow("Output", frame)
             cv2.imshow("Gray", gray)
+            # cv2.imshow("Mask", mask)
             cv2.imshow("Mask", mask)
             # prev_fg_mask = fgmask
 
