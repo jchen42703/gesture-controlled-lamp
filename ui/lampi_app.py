@@ -6,7 +6,7 @@ from kivy.uix.label import Label
 from math import fabs
 import platform
 import pigpio
-import lampi.lampi_util
+import ui.lampi_util
 
 
 # kludgey way to figure out if we're on the Raspberry Pi
