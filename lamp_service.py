@@ -52,4 +52,5 @@ class LampService:
 
     def run_from_gesture(self, gesture: str):
         operation = self.get_operation_from_gesture(gesture)
-        return self.run_op(operation)
+        self.run_op(operation)
+        return gesture
