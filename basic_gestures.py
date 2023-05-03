@@ -67,7 +67,7 @@ def detect_motion(initial_frame, curr_frame, threshold=180) -> bool:
         initial_frame, curr_frame, threshold)
     print("Largest contour area: ", largest_contour_area)
     START_RECORDING_AREA_THRESH = 700
-    return largest_contour_area > START_RECORDING_AREA_THRESH
+    return largest_contour_area > START_RECORDING_AREA_THRESH, largest_contour_area
 
 
 if __name__ == "__main__":
@@ -76,9 +76,11 @@ if __name__ == "__main__":
     import pathlib
     import time
     import imutils
+    from GestureDetector import GestureDetector
 
     cwd = pathlib.Path(__file__).parent.resolve()
     cap = cv2.VideoCapture(0)
+    gesture_detector = GestureDetector()
 
     # Initialize variables for motion detection
     motion_detected = False
@@ -93,6 +95,7 @@ if __name__ == "__main__":
     pred_label = 0
     initial_frame_gray = None
     initial_max = 80
+    gesture = OPERATIONS[0]
     try:
         i = 0
         while True:
@@ -105,29 +108,26 @@ if __name__ == "__main__":
                 initial_frame_gray = gray
                 continue
 
-            detected = detect_motion(initial_frame_gray, gray, initial_max)
+            detected, contour_area = detect_motion(
+                initial_frame_gray, gray, initial_max)
             # Record for the next 16 frames and see the changes in motion
             mask, delta = get_mask_basic(initial_frame_gray, gray, initial_max)
             if initial_max == 80:
                 initial_max = max(delta.max() * 1.75, initial_max)
 
             if detected:
-                print("Detected motion!")
+                gesture = gesture_detector.detect_gesture_type(
+                    mask, contour_area)
+                print("Detected motion! Gesture: ", gesture)
             else:
                 print("Stopped detecting...")
 
-            if i != 0 and i % num_frame_collect == 0:
-                cv2.putText(frame, OPERATIONS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                            1, (0, 0, 255), 2, cv2.LINE_AA)
-
             # show the prediction on the frame
-            cv2.putText(frame, OPERATIONS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+            cv2.putText(frame, gesture_detector.get_operation_from_gesture(gesture), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.imshow("Output", frame)
             cv2.imshow("Gray", gray)
-            # cv2.imshow("Mask", mask)
             cv2.imshow("Mask", mask)
-            # prev_fg_mask = fgmask
 
             if cv2.waitKey(1) == ord('q'):
                 break
