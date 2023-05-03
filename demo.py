@@ -77,9 +77,10 @@ if __name__ == "__main__":
     motion_start_time = 0
     motion_stop_time = 0
     input_dim = 112
+    num_frame_collect = 16
     try:
         i = 0
-        gathered_img = np.zeros((16, 3, input_dim, input_dim))
+        gathered_img = np.zeros((num_frame_collect, 3, input_dim, input_dim))
         pred_label = 0
         # prev_fg_mask = None
         while True:
@@ -91,19 +92,27 @@ if __name__ == "__main__":
 
             reshaped, frame = preprocess_mobilenetv2_from_cv2(
                 frame, reshape_size=(input_dim, input_dim))
-            gathered_img[i % 16] = reshaped
+            gathered_img[i % num_frame_collect] = reshaped
             # if i != 0 and i % 2 == 0:
             #     motion_detected, motion_start_time, motion_stop_time = detect_motion(fgmask, prev_fg_mask, motion_detected,
             #                                                                          motion_start_time=motion_start_time,
             #                                                                          motion_stop_time=motion_stop_time,
             #                                                                          counter=i)
-            if i != 0 and i % 20 == 0:
+            if i != 0 and i % num_frame_collect == 0:
                 # if motion_detected:
                 # print("Motion Detected: ", motion_detected)
                 input_tensor = preprocess_mobilenetv2_queued(gathered_img)
+                first_time = time.time()
                 pred = model(input_tensor)
+                after_pred_time = time.time()
+                print("Prediction time: ", after_pred_time - first_time)
                 pred_label = int(torch.argmax(pred))
-                gathered_img = np.zeros((16, 3, input_dim, input_dim))
+                gathered_img = np.zeros(
+                    (num_frame_collect, 3, input_dim, input_dim))
+
+                cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                            1, (0, 0, 255), 2, cv2.LINE_AA)
+                time.sleep(0.5)
             # show the prediction on the frame
             cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 0, 255), 2, cv2.LINE_AA)
@@ -114,7 +123,7 @@ if __name__ == "__main__":
             if cv2.waitKey(1) == ord('q'):
                 break
             i += 1
-            time.sleep(0.1)
+            time.sleep(0.05)
     finally:
         # release the webcam and destroy all active windows
         print("Cleaning up...")
