@@ -88,7 +88,7 @@ class LampiApp(App):
 
     def update_popup_ip_address(self, instance):
         interface = "wlan0"
-        ipaddr = lampi.lampi_util.get_ip_address(interface)
+        ipaddr = ui.lampi_util.get_ip_address(interface)
         instance.content.text = "{}: {}".format(interface, ipaddr)
 
     def on_gpio17_pressed(self, instance, value):
