@@ -79,7 +79,8 @@ if __name__ == "__main__":
     from GestureDetector import GestureDetector
 
     cwd = pathlib.Path(__file__).parent.resolve()
-    cap = cv2.VideoCapture(0)
+    video_path_or_idx = "/dev/video2"
+    cap = cv2.VideoCapture(video_path_or_idx)
     gesture_detector = GestureDetector(abs_diff_thresh=0.05)
 
     # Initialize variables for motion detection
@@ -94,7 +95,8 @@ if __name__ == "__main__":
     ]
     pred_label = 0
     initial_frame_gray = None
-    initial_max = 80
+    INITIAL_DELTA_MAX = 80
+    initial_max = INITIAL_DELTA_MAX
     gesture = OPERATIONS[0]
     try:
         i = 0
@@ -103,7 +105,7 @@ if __name__ == "__main__":
             _, frame = cap.read()
             frame = imutils.resize(frame, width=500)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray = cv2.GaussianBlur(gray, (21, 21), 0)
+            # gray = cv2.GaussianBlur(gray, (21, 21), 0)
             if initial_frame_gray is None:
                 initial_frame_gray = gray
                 continue
@@ -112,8 +114,12 @@ if __name__ == "__main__":
                 initial_frame_gray, gray, initial_max)
             # Record for the next 16 frames and see the changes in motion
             mask, delta = get_mask_basic(initial_frame_gray, gray, initial_max)
-            if initial_max == 80:
-                initial_max = max(delta.max() * 1.75, initial_max)
+            # Set the threshhold
+            if initial_max == INITIAL_DELTA_MAX:
+                # This needs to be calibrated
+                # Sometimes the initial delta.max() is far too low to be good
+                # enough
+                initial_max = max(delta.max()*1.75, INITIAL_DELTA_MAX-30)
 
             if detected:
                 gesture = gesture_detector.detect_gesture_type(
