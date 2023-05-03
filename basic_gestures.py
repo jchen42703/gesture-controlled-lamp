@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     cwd = pathlib.Path(__file__).parent.resolve()
     cap = cv2.VideoCapture(0)
-    gesture_detector = GestureDetector()
+    gesture_detector = GestureDetector(abs_diff_thresh=0.05)
 
     # Initialize variables for motion detection
     motion_detected = False
@@ -132,7 +132,7 @@ if __name__ == "__main__":
             if cv2.waitKey(1) == ord('q'):
                 break
             i += 1
-            time.sleep(0.05)
+            time.sleep(0.1)
     finally:
         # release the webcam and destroy all active windows
         print("Cleaning up...")
