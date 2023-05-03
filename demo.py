@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
                 cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                             1, (0, 0, 255), 2, cv2.LINE_AA)
-                time.sleep(0.5)
+
             # show the prediction on the frame
             cv2.putText(frame, JESTER_LABELS[pred_label], (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 0, 255), 2, cv2.LINE_AA)
