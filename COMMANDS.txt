@@ -1,4 +1,4 @@
-ssh -X -A -i ~/.ssh/id_rsa -i ~/.ssh/id_ed25519_github pi@172.20.43.27
+ssh -X -A -i ~/.ssh/id_rsa -i ~/.ssh/id_ed25519_github pi@172.20.44.242
 
 scp -i ~/.ssh/id_rsa pi@172.20.43.27:/home/pi/gesture-controlled-lamp/*.png /home/joseph/Desktop/test_images
 

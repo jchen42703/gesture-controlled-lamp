@@ -76,7 +76,7 @@ if __name__ == "__main__":
     import pathlib
     import time
     import imutils
-    from GestureDetector import GestureDetector
+    from gesture_detector import GestureDetector
     import argparse
     parser = argparse.ArgumentParser(
         prog='gesture-lamp',
@@ -84,6 +84,7 @@ if __name__ == "__main__":
         epilog='Text at the bottom of help')
     parser.add_argument('video')
     parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('-l', '--is-lampi', action='store_true')
     args = parser.parse_args()
 
     cwd = pathlib.Path(__file__).parent.resolve()
@@ -91,7 +92,8 @@ if __name__ == "__main__":
     if args.video.isdigit():
         args.video = int(args.video)
     cap = cv2.VideoCapture(args.video)
-    gesture_detector = GestureDetector(abs_diff_thresh=0.05)
+    detector = GestureDetector(
+        abs_diff_thresh=0.05, lampi=args.is_lampi)
 
     # Initialize variables for motion detection
     motion_detected = False
@@ -133,7 +135,7 @@ if __name__ == "__main__":
                 initial_max = max(delta.max()*1.75, INITIAL_DELTA_MAX-30)
 
             if detected:
-                gesture = gesture_detector.detect_gesture_type(
+                gesture = detector.detect_gesture_type(
                     mask, contour_area)
                 print("Detected motion! Gesture: ", gesture)
             else:
@@ -141,7 +143,7 @@ if __name__ == "__main__":
 
             if args.debug:
                 # show the prediction on the frame
-                cv2.putText(frame, gesture_detector.get_operation_from_gesture(gesture),
+                cv2.putText(frame, detector.get_operation_from_gesture(gesture),
                             (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                             1, (0, 0, 255), 2, cv2.LINE_AA)
                 cv2.imshow("Output", frame)
