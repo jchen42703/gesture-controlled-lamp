@@ -77,10 +77,20 @@ if __name__ == "__main__":
     import time
     import imutils
     from GestureDetector import GestureDetector
+    import argparse
+    parser = argparse.ArgumentParser(
+        prog='gesture-lamp',
+        description='Runs gesture controlled lamp',
+        epilog='Text at the bottom of help')
+    parser.add_argument('video')
+    parser.add_argument('-d', '--debug', action='store_true')
+    args = parser.parse_args()
 
     cwd = pathlib.Path(__file__).parent.resolve()
-    video_path_or_idx = "/dev/video2"
-    cap = cv2.VideoCapture(video_path_or_idx)
+    # video_path_or_idx = "/dev/video2"
+    if args.video.isdigit():
+        args.video = int(args.video)
+    cap = cv2.VideoCapture(args.video)
     gesture_detector = GestureDetector(abs_diff_thresh=0.05)
 
     # Initialize variables for motion detection
@@ -93,6 +103,7 @@ if __name__ == "__main__":
         "Increase Brightness",
         "Decrease Brightness",
     ]
+
     pred_label = 0
     initial_frame_gray = None
     INITIAL_DELTA_MAX = 80
@@ -128,15 +139,17 @@ if __name__ == "__main__":
             else:
                 print("Stopped detecting...")
 
-            # show the prediction on the frame
-            cv2.putText(frame, gesture_detector.get_operation_from_gesture(gesture), (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 0, 255), 2, cv2.LINE_AA)
-            cv2.imshow("Output", frame)
-            cv2.imshow("Gray", gray)
-            cv2.imshow("Mask", mask)
+            if args.debug:
+                # show the prediction on the frame
+                cv2.putText(frame, gesture_detector.get_operation_from_gesture(gesture),
+                            (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                            1, (0, 0, 255), 2, cv2.LINE_AA)
+                cv2.imshow("Output", frame)
+                cv2.imshow("Gray", gray)
+                cv2.imshow("Mask", mask)
 
-            if cv2.waitKey(1) == ord('q'):
-                break
+                if cv2.waitKey(1) == ord('q'):
+                    break
             i += 1
             time.sleep(0.1)
     finally:
