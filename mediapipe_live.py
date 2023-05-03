@@ -10,7 +10,7 @@ if __name__ == "__main__":
     GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
     VisionRunningMode = mp.tasks.vision.RunningMode
 
-    model_path = '/home/pi/gesture-controlled-lamp/gesture_recognizer.task'
+    model_path = './gesture_recognizer.task'
     base_options = BaseOptions(model_asset_path=model_path)
 
     # Create a gesture recognizer instance with the live stream mode:
