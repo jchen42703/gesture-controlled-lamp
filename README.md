@@ -6,3 +6,21 @@
   - On the Pi, the prediction times shoot up to 2-2.5s. Hence, it's roughly 10x slower.
     - But, on Pi, the memory consumed is really little (only 20% while script is running).
   - For real-time gesture recognition, 2.5s is far too slow.
+- With TFLite, able to get around 0.5s prediction times on the Pi, but that's still way too slow (ends up processing at roughly 1 frame per second)
+  - Need around 100-200ms prediction speed to be viable.
+
+## Back-Up Plan 1
+
+Scope out complicated gesture detection and just use basic computer vision.
+
+1. Register initial frame.
+2. Check the difference between the current frame and initial frame.
+3. Start "recording" after the current frame's object's area exceeds `AREA_THRESHOLD`.
+4. Record the next 16 frames.
+   1. If the area decreases over those 16 frames, decrease the brightness.
+   2. If the area increases over those 16 frames, increase the brightness.
+5. After 16 frames, re-check the object's size in the frame. If it exceeds `AREA_THRESHOLD`, start recording again and repeat.
+
+## Back-Up Plan 2
+
+WS API with GPU Model Prediction EC2 Instance
