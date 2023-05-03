@@ -1,10 +1,6 @@
 import cv2
-SUPPORTED_GESTURES = [
-    "Do nothing",
-    "Swipe left",
-    "Move hand in",
-    "Move hand away",
-]
+from lamp_common import *
+from lamp_service import LampService
 
 
 class GestureDetector:
@@ -17,6 +13,7 @@ class GestureDetector:
         self.prev_mask = None
         self.prev_contour_area = None
         self.abs_diff_thresh = abs_diff_thresh
+        self.lampi_service = LampService()
 
     def detect_gesture_type(self, curr_mask, curr_contour_area):
         """Collects differences in contour area sizes in the current window
@@ -36,32 +33,20 @@ class GestureDetector:
 
         # If the area size change isn't big enough, do nothing
         if abs(percent_diff) < self.abs_diff_thresh:
-            return SUPPORTED_GESTURES[0]
+            # return SUPPORTED_GESTURES[0]
+            return self.lampi_service.run_from_gesture(SUPPORTED_GESTURES[0])
 
         # If contour area size changes are increasing -> Move hand in
         if percent_diff > 0:
-            return SUPPORTED_GESTURES[2]
+            # return SUPPORTED_GESTURES[2]
+            return self.lampi_service.run_from_gesture(SUPPORTED_GESTURES[2])
 
         # If decreasing -> move hand away
         if percent_diff < 0:
-            return SUPPORTED_GESTURES[3]
+            # return SUPPORTED_GESTURES[3]
+            return self.lampi_service.run_from_gesture(SUPPORTED_GESTURES[3])
 
-        return
-
-    def get_operation_from_gesture(self, gesture: str) -> str:
-        OPERATIONS = [
-            "Do nothing",
-            "Increase Brightness",
-            "Decrease Brightness",
-        ]
-        if gesture == SUPPORTED_GESTURES[0]:
-            return OPERATIONS[0]
-        elif gesture == SUPPORTED_GESTURES[1]:
-            return OPERATIONS[0]
-        elif gesture == SUPPORTED_GESTURES[2]:
-            return OPERATIONS[1]
-        else:
-            return OPERATIONS[2]
+        return self.lampi_service.run_from_gesture(SUPPORTED_GESTURES[-1])
 
 
 def get_mask_basic(initial_frame, curr_frame, threshold):
