@@ -16,10 +16,14 @@ Scope out complicated gesture detection and just use basic computer vision.
 1. Register initial frame.
 2. Check the difference between the current frame and initial frame.
 3. Start "recording" after the current frame's object's area exceeds `AREA_THRESHOLD`.
-4. Record the next 16 frames.
-   1. If the area decreases over those 16 frames, decrease the brightness.
-   2. If the area increases over those 16 frames, increase the brightness.
-5. After 16 frames, re-check the object's size in the frame. If it exceeds `AREA_THRESHOLD`, start recording again and repeat.
+4. While reading each frame:
+   1. If the area decreases, decrease the brightness.
+   2. If the area increases, increase the brightness.
+   3. What if they don't move?
+      1. Brightness doesn't change
+   4. Quick swipe left: toggle lamp
+   5. If the area is `<= AREA_THRESHOLD`, stop recording.
+5. Repeat!
 
 ## Back-Up Plan 2
 
