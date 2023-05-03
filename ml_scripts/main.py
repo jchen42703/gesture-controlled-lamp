@@ -2,7 +2,7 @@ if __name__ == "__main__":
     import cv2
     import numpy as np
     import torch
-    from infer import *
+    from ml_scripts.infer import *
     from config import read_config
     import pathlib
     import os

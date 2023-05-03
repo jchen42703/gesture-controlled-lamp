@@ -2,7 +2,7 @@ import torch
 import cv2
 import numpy as np
 
-from generate import generate_model
+from ml_scripts.generate import generate_model
 from dataclasses import dataclass
 
 JESTER_LABELS = [
