@@ -34,7 +34,8 @@ class LampService:
 
     def decrease_brightness(self):
         new_brightness = self.brightness - 0.1
-        self.brightness = max(new_brightness, 0)
+        new_brightness = max(new_brightness, 0)
+        self.brightness = new_brightness
         print("Decreasing brightness to ", new_brightness)
         self.lamp_driver.set_lamp_state(self.default_hue, self.default_saturation,
                                         new_brightness, True)
