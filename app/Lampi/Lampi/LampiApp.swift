@@ -9,7 +9,7 @@ import Mixpanel
 @main
 struct LampiApp: App {
     #warning("Update DEVICE_NAME")
-    let DEVICE_NAME = "LAMPI b827eb1e9033"
+    let DEVICE_NAME = "GESTURE_LAMPI_b827eb1e9033"
     let USE_BROWSER = false
 
     var body: some Scene {

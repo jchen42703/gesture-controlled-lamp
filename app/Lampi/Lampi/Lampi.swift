@@ -61,9 +61,9 @@ class Lampi: NSObject, ObservableObject {
 }
 
 extension Lampi {
-    static let SERVICE_UUID = CBUUID(string: "0001A7D3-D8A4-4FEA-8174-1736E808C066")
-    static let INC_BRIGHTNESS_UUID = CBUUID(string: "de9e20ae-f521-4cc3-9cc8-51ce9e7730f4")
-    static let DEC_BRIGHTNESS_UUID = CBUUID(string: "6a104faf-832b-4a66-9a6c-7a1cf924f223")
+    static let SERVICE_UUID = CBUUID(string: "E16D893B-5594-4940-B49C-CCE40F5ADA6A")
+    static let INC_BRIGHTNESS_UUID = CBUUID(string: "CC8E0047-61F3-487E-96A1-637A4450AE33")
+    static let DEC_BRIGHTNESS_UUID = CBUUID(string: "13ACBAEB-4DB2-425E-B067-49A5472592D2")
 
     private var shouldSkipUpdateDevice: Bool {
         return skipNextDeviceUpdate || pendingBluetoothUpdate
@@ -152,6 +152,7 @@ extension Lampi: CBPeripheralDelegate {
         guard let characteristics = service.characteristics else { return }
 
         for characteristic in characteristics {
+            print("Char: ", characteristic.uuid)
             switch characteristic.uuid {
             case Lampi.DEC_BRIGHTNESS_UUID:
                 self.decBrightnessChar = characteristic
@@ -174,20 +175,17 @@ extension Lampi: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        skipNextDeviceUpdate = true
-
         guard let updatedValue = characteristic.value,
               !updatedValue.isEmpty else { return }
-
         switch characteristic.uuid {
-
         case Lampi.INC_BRIGHTNESS_UUID:
-            
             state.incBrightnessGesture = String(decoding: updatedValue, as: UTF8.self)
+            print("Increase Brightness Gesture: ", state.incBrightnessGesture)
 
         case Lampi.DEC_BRIGHTNESS_UUID:
             state.decBrightnessGesture = String(decoding: updatedValue, as: UTF8.self)
-
+        
+        print("State: ", state)
         default:
             print("Unhandled Characteristic UUID: \(characteristic.uuid)")
         }
