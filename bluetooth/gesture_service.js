@@ -6,7 +6,7 @@ var DecreaseBrightnessCharacteristic = require("./dec_brightness_characteristic"
 
 function GestureService(gestureState) {
   bleno.PrimaryService.call(this, {
-    uuid: "0001A7D3-D8A4-4FEA-8174-1736E808C066",
+    uuid: "E16D893B-5594-4940-B49C-CCE40F5ADA6A",
     characteristics: [new IncreaseBrightnessCharacteristic(gestureState),
                       new DecreaseBrightnessCharacteristic(gestureState)
                     ],

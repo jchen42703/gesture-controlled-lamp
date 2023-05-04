@@ -11,7 +11,7 @@ console.log(currConfig);
 
 var IncreaseBrightnessCharacteristic = function (gestureState) {
   bleno.Characteristic.call(this, {
-    uuid: "de9e20ae-f521-4cc3-9cc8-51ce9e7730f4",
+    uuid: "CC8E0047-61F3-487E-96A1-637A4450AE33",
     properties: ["read", "write"],
     descriptors: [
       new bleno.Descriptor({
@@ -42,9 +42,8 @@ IncreaseBrightnessCharacteristic.prototype.onReadRequest = function (
     const currConfig = yaml.load(fs.readFileSync('../config.yaml', 'utf8'));
     const gesture = currConfig.increase_brightness_gesture
     console.log("increase brightness gesture: ", gesture)
-    var data = Buffer.from(gesture);
-    // data.writeUInt8(this.deviceState.value);
-    // console.log("onReadRequest returning ", data);
+    let data = Buffer.from(gesture, "utf8")
+    console.log("increase brightness onReadRequest returning ", data, offset);
     callback(this.RESULT_SUCCESS, data);
   }
 };

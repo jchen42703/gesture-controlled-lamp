@@ -4,8 +4,8 @@ var device_id = child_process
   .toString()
   .replace(/\n$/, "");
 
-process.env["BLENO_DEVICE_NAME"] = "LAMPI " + device_id;
-
+process.env["BLENO_DEVICE_NAME"] = "GESTURE_LAMPI_" + device_id;
+console.log("DEVICE: ", process.env["BLENO_DEVICE_NAME"])
 var bleno = require("bleno");
 
 var DeviceInfoService = require("./device-info-service");

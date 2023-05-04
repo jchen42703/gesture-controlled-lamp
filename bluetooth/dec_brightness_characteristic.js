@@ -11,7 +11,7 @@ console.log(currConfig);
 
 var DecreaseBrightnessCharacteristic = function (gestureState) {
   bleno.Characteristic.call(this, {
-    uuid: "6a104faf-832b-4a66-9a6c-7a1cf924f223",
+    uuid: "13ACBAEB-4DB2-425E-B067-49A5472592D2",
     properties: ["read", "write"],
     descriptors: [
       new bleno.Descriptor({
@@ -42,7 +42,7 @@ DecreaseBrightnessCharacteristic.prototype.onReadRequest = function (
     const currConfig = yaml.load(fs.readFileSync('../config.yaml', 'utf8'));
     const gesture = currConfig.decrease_brightness_gesture
     console.log("decrease brightness gesture: ", gesture)
-    var data = Buffer.from(gesture);
+    var data = Buffer.from(gesture, "utf-8");
     // data.writeUInt8(this.deviceState.value);
     // console.log("decrease onReadRequest returning ", data);
     callback(this.RESULT_SUCCESS, data);
