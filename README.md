@@ -11,10 +11,13 @@ python3 run_ui.py
 Run the gesture detection:
 
 ```bash
-python3 basic_gestures.py 1
+python3 basic_gestures.py 1 -l
 
 # With debug mode (see camera feed)
-python3 basic_gestures.py 1 -d
+python3 basic_gestures.py 1 -d -l
+
+# On local
+python3 basic_gestures.py /dev/video2 -d
 ```
 
 Run the bluetooth service:

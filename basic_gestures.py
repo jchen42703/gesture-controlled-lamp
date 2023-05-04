@@ -84,7 +84,7 @@ if __name__ == "__main__":
         epilog='Text at the bottom of help')
     parser.add_argument('video')
     parser.add_argument('-d', '--debug', action='store_true')
-    parser.add_argument('-l', '--is-lampi', action='store_true')
+    parser.add_argument('-l', '--is-lampi', default=False)
     args = parser.parse_args()
 
     cwd = pathlib.Path(__file__).parent.resolve()
