@@ -1,5 +1,5 @@
 from kivy.app import App
-from kivy.properties import NumericProperty, AliasProperty, BooleanProperty
+from kivy.properties import NumericProperty, AliasProperty, BooleanProperty, StringProperty
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
@@ -7,6 +7,7 @@ from math import fabs
 import platform
 import pigpio
 import ui.lampi_util
+from config import read_config
 
 
 # kludgey way to figure out if we're on the Raspberry Pi
@@ -20,6 +21,8 @@ else:
 
 TOLERANCE = 0.000001
 
+gesture_config = read_config("./config.yaml")
+print("config: ", gesture_config)
 
 class LampiApp(App):
     _hue = NumericProperty(1.0)
@@ -54,6 +57,9 @@ class LampiApp(App):
     brightness = AliasProperty(_get_brightness, _set_brightness,
                                bind=['_brightness'])
     gpio17_pressed = BooleanProperty(False)
+
+    increase_brightness_gesture = StringProperty(gesture_config.increase_brightness_gesture)
+    decrease_brightness_gesture = StringProperty(gesture_config.decrease_brightness_gesture)
 
     def on_start(self):
         self.lamp_driver = LampDriver()
