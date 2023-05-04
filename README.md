@@ -17,6 +17,15 @@ python3 basic_gestures.py 1
 python3 basic_gestures.py 1 -d
 ```
 
+Run the bluetooth service:
+
+```bash
+cd bluetooth
+node peripheral.js
+```
+
+For the IOS app, open the XCode project in `app/Lampi/Lampi.xcodeproj`.
+
 ## Notes
 
 - On local computer, the `jester_shufflenet_0.5x_G3_RGB_16_best.pth` has prediction times ranging from roughly 0.1-0.2s.
