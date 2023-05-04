@@ -1,5 +1,22 @@
 # Gesture Controlled Lamp
 
+## Getting Started
+
+Run the Kivy UI:
+
+```bash
+python3 run_ui.py
+```
+
+Run the gesture detection:
+
+```bash
+python3 basic_gestures.py 1
+
+# With debug mode (see camera feed)
+python3 basic_gestures.py 1 -d
+```
+
 ## Notes
 
 - On local computer, the `jester_shufflenet_0.5x_G3_RGB_16_best.pth` has prediction times ranging from roughly 0.1-0.2s.
