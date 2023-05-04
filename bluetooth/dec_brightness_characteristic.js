@@ -4,14 +4,14 @@ var bleno = require("bleno");
 const yaml = require('js-yaml');
 const fs = require("fs")
 
-var CHARACTERISTIC_NAME = "Increase Brightness Gesture";
+var CHARACTERISTIC_NAME = "Decrease Brightness Gest";
 
 const currConfig = yaml.load(fs.readFileSync('../config.yaml', 'utf8'));
 console.log(currConfig);
 
-var IncreaseBrightnessCharacteristic = function (gestureState) {
+var DecreaseBrightnessCharacteristic = function (gestureState) {
   bleno.Characteristic.call(this, {
-    uuid: "de9e20ae-f521-4cc3-9cc8-51ce9e7730f4",
+    uuid: "6a104faf-832b-4a66-9a6c-7a1cf924f223",
     properties: ["read", "write"],
     descriptors: [
       new bleno.Descriptor({
@@ -20,7 +20,7 @@ var IncreaseBrightnessCharacteristic = function (gestureState) {
       }),
       new bleno.Descriptor({
         uuid: "2904",
-        value: "Set increase",
+        value: "Set decrease",
       }),
     ],
   });
@@ -28,42 +28,42 @@ var IncreaseBrightnessCharacteristic = function (gestureState) {
   this.deviceState = gestureState;
 };
 
-util.inherits(IncreaseBrightnessCharacteristic, bleno.Characteristic);
+util.inherits(DecreaseBrightnessCharacteristic, bleno.Characteristic);
 
-IncreaseBrightnessCharacteristic.prototype.onReadRequest = function (
+DecreaseBrightnessCharacteristic.prototype.onReadRequest = function (
   offset,
   callback
 ) {
-  console.log("increase onReadRequest");
+  console.log("decrease brightness onReadRequest");
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null);
   } else {
     // Read the yaml and return
     const currConfig = yaml.load(fs.readFileSync('../config.yaml', 'utf8'));
-    const gesture = currConfig.increase_brightness_gesture
-    console.log("increase brightness gesture: ", gesture)
+    const gesture = currConfig.decrease_brightness_gesture
+    console.log("decrease brightness gesture: ", gesture)
     var data = Buffer.from(gesture);
     // data.writeUInt8(this.deviceState.value);
-    // console.log("onReadRequest returning ", data);
+    // console.log("decrease onReadRequest returning ", data);
     callback(this.RESULT_SUCCESS, data);
   }
 };
 
-IncreaseBrightnessCharacteristic.prototype.onWriteRequest = function (
+DecreaseBrightnessCharacteristic.prototype.onWriteRequest = function (
   data,
   offset,
   withoutResponse,
   callback
 ) {
-  console.log("increase onWriteRequest");
+  console.log("decrease brightness onWriteRequest");
   if (offset) {
     console.log("onWriteRequest RESULT_ATTR_NOT_LONG");
     callback(this.RESULT_ATTR_NOT_LONG);
   } else {
     var new_gesture = data.toString("utf-8");
-    console.log("increase onWriteRequest ", new_gesture);
+    console.log("decrease brightness onWriteRequest gest: ", new_gesture);
     // TODO: write to config
-    currConfig.increase_brightness_gesture = new_gesture
+    currConfig.decrease_brightness_gesture = new_gesture
     console.log("writing cfg: ", currConfig);
     const new_yaml = yaml.dump(currConfig, {
       'styles': {
@@ -76,4 +76,4 @@ IncreaseBrightnessCharacteristic.prototype.onWriteRequest = function (
   }
 };
 
-module.exports = IncreaseBrightnessCharacteristic;
+module.exports = DecreaseBrightnessCharacteristic;
