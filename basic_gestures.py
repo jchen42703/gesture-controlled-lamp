@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
             if args.debug:
                 # show the prediction on the frame
-                cv2.putText(frame, detector.get_operation_from_gesture(gesture),
+                cv2.putText(frame, gesture,
                             (10, 50), cv2.FONT_HERSHEY_SIMPLEX,
                             1, (0, 0, 255), 2, cv2.LINE_AA)
                 cv2.imshow("Output", frame)
