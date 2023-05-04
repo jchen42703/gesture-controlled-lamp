@@ -1,28 +1,31 @@
 from lamp_common import SUPPORTED_GESTURES, OPERATIONS
 from lamp_driver import LampDriver
+from config import LampGestureConfig, read_config
 
 
 class LampService:
     """Controls the LampDriver based on the recognized gestures.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, config_path: str) -> None:
         self.lamp_driver = LampDriver()
         self.default_hue = 1
         self.default_saturation = 0.5
         self.brightness = 0
+        self.config = read_config(config_path)
 
     def get_operation_from_gesture(self, gesture: str) -> str:
         """TODO: change to read from config
         """
-        if gesture == SUPPORTED_GESTURES[0]:
-            return OPERATIONS[0]
-        elif gesture == SUPPORTED_GESTURES[1]:
-            return OPERATIONS[0]
-        elif gesture == SUPPORTED_GESTURES[2]:
+        # Check for increase brightness
+        if self.config.increase_brightness_gesture == gesture:
             return OPERATIONS[1]
-        else:
+
+        # Check for decrease brightness
+        if self.config.decrease_brightness_gesture == gesture:
             return OPERATIONS[2]
+
+        return OPERATIONS[0]
 
     def increase_brightness(self):
         new_brightness = self.brightness + 0.1 if self.brightness > 0 else 0.1

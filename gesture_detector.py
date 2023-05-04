@@ -8,12 +8,12 @@ class GestureDetector:
     gestures when a motion starts.
     """
 
-    def __init__(self, lampi=False, abs_diff_thresh=0.02) -> None:
+    def __init__(self, lampi=False, abs_diff_thresh=0.02, config_path="./config.yaml") -> None:
         self.lampi = lampi
         self.prev_mask = None
         self.prev_contour_area = None
         self.abs_diff_thresh = abs_diff_thresh
-        self.lampi_service = LampService()
+        self.lampi_service = LampService(config_path=config_path)
 
     def detect_gesture_type(self, curr_mask, curr_contour_area):
         """Collects differences in contour area sizes in the current window
