@@ -1,4 +1,3 @@
-#! /usr/bin/env node
 var child_process = require("child_process");
 var device_id = child_process
   .execSync("cat /sys/class/net/eth0/address | sed s/://g")
@@ -7,15 +6,42 @@ var device_id = child_process
 
 process.env["BLENO_DEVICE_NAME"] = "LAMPI " + device_id;
 
-var serviceName = "LampiService";
 var bleno = require("bleno");
 
-var LampiState = require("./lampi-state");
-var LampiService = require("./lampi-service");
+var DeviceInfoService = require("./device-info-service");
 
-var lampiState = new LampiState();
-var lampiService = new LampiService(lampiState);
-var deviceInfoService = new DeviceInfoService("CWRU", "LAMPI", device_id);
+var DeviceState = require("./device-state");
+var GestureConfigService = require("./gesture-cfg-characteristic");
+
+var deviceState = new DeviceState();
+
+var deviceInfoService = new DeviceInfoService("CWRU", "LAMPI", "123456");
+var gestureCfgService = new GestureConfigService(deviceState);
+
+deviceState.on("changed", function (new_value) {
+  console.log("changed:  value = %d", new_value);
+});
+
+setInterval(function () {
+  deviceState.set_value(deviceState.value + 1);
+}, 1000);
+
+bleno.on("stateChange", function (state) {
+  if (state === "poweredOn") {
+    bleno.startAdvertising(
+      "MyService",
+      [gestureCfgService.uuid, deviceInfoService.uuid],
+      function (err) {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+  } else {
+    bleno.stopAdvertising();
+    console.log("not poweredOn");
+  }
+});
 
 bleno.on("advertisingStart", function (err) {
   if (!err) {
@@ -24,14 +50,6 @@ bleno.on("advertisingStart", function (err) {
     // Once we are advertising, it's time to set up our services,
     // along with our characteristics.
     //
-    bleno.setServices([lampiService]);
+    bleno.setServices([gestureCfgService, deviceInfoService]);
   }
-});
-
-bleno.on("accept", function (clientAddress) {
-  console.log("accept: " + clientAddress);
-});
-
-bleno.on("disconnect", function (clientAddress) {
-  console.log("disconnect: " + clientAddress);
 });
