@@ -1,4 +1,4 @@
-on_gesture: null
-off_gesture: null
-increase_brightness_gesture: "Move hand in"
-decrease_brightness_gesture: "Move hand away"
+decrease_brightness_gesture: Move hand away
+increase_brightness_gesture: Move hand in
+off_gesture: ~
+on_gesture: ~

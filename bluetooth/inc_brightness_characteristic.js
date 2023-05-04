@@ -60,9 +60,18 @@ IncreaseBrightnessCharacteristic.prototype.onWriteRequest = function (
     console.log("onWriteRequest RESULT_ATTR_NOT_LONG");
     callback(this.RESULT_ATTR_NOT_LONG);
   } else {
-    var new_value = data.toString("utf-8");
-    console.log("onWriteRequest ", new_value);
+    var new_gesture = data.toString("utf-8");
+    console.log("onWriteRequest ", new_gesture);
     // TODO: write to config
+    currConfig.increase_brightness_gesture = new_gesture
+    console.log("writing cfg: ", currConfig);
+    const new_yaml = yaml.dump(currConfig, {
+      'styles': {
+        '!!null': 'canonical' // dump null as ~
+      },
+      'sortKeys': true        // sort object keys
+    });
+    fs.writeFileSync('../config.yaml', new_yaml);
     callback(this.RESULT_SUCCESS);
   }
 };
