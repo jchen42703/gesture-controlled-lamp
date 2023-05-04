@@ -10,27 +10,18 @@ var bleno = require("bleno");
 
 var DeviceInfoService = require("./device-info-service");
 
-var DeviceState = require("./device-state");
-var GestureConfigService = require("./gesture-cfg-characteristic");
+const GestureState = require("./gesture_state")
+var GestureService = require("./gesture_service");
 
-var deviceState = new DeviceState();
-
+const gestureState = new GestureState();
 var deviceInfoService = new DeviceInfoService("CWRU", "LAMPI", "123456");
-var gestureCfgService = new GestureConfigService(deviceState);
-
-deviceState.on("changed", function (new_value) {
-  console.log("changed:  value = %d", new_value);
-});
-
-setInterval(function () {
-  deviceState.set_value(deviceState.value + 1);
-}, 1000);
+var gestureService = new GestureService(gestureState);
 
 bleno.on("stateChange", function (state) {
   if (state === "poweredOn") {
     bleno.startAdvertising(
-      "MyService",
-      [gestureCfgService.uuid, deviceInfoService.uuid],
+      "Gesture Lamp Config",
+      [gestureService.uuid, deviceInfoService.uuid],
       function (err) {
         if (err) {
           console.log(err);
@@ -50,6 +41,7 @@ bleno.on("advertisingStart", function (err) {
     // Once we are advertising, it's time to set up our services,
     // along with our characteristics.
     //
-    bleno.setServices([gestureCfgService, deviceInfoService]);
+    bleno.setServices([gestureService, deviceInfoService]);
+    console.log("set services!")
   }
 });
