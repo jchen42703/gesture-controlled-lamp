@@ -58,7 +58,7 @@ if __name__ == "__main__":
     import cv2
     import numpy as np
     import torch
-    from ml_scripts.infer import *
+    from infer import *
     import pathlib
     import os
 

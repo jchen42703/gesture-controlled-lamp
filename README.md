@@ -29,6 +29,13 @@ node peripheral.js
 
 For the IOS app, open the XCode project in `app/Lampi/Lampi.xcodeproj`.
 
+Run the ML gesture detection:
+
+```bash
+cd ml_scripts
+python3 demo.py
+```
+
 ## Notes
 
 - On local computer, the `jester_shufflenet_0.5x_G3_RGB_16_best.pth` has prediction times ranging from roughly 0.1-0.2s.
